@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { randomUUID } = require('crypto');
 const { read } = require('./helpers');
-// const { write } = require('./helpers/fs/write');
+const { validationEmail, validationPassdword } = require('./middlewares/validations');
 
 // console.log(fs.read);
 
@@ -38,7 +38,7 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 // requisito 3
-app.post('/login', async (req, res) => {
+app.post('/login', validationEmail, validationPassdword, async (req, res) => {
   const tokenttt = randomUUID().split('-').join('').substring(0, 16);
 
   return res.status(200).json({ token: tokenttt });
