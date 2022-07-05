@@ -1,4 +1,5 @@
-const { read, write } = require('./fs');
+const { read } = require('./fs/read');
+const { write } = require('./fs/write');
 
 module.exports = {
   read,

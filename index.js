@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('./helpers');
+const { randomUUID } = require('crypto');
+const { read } = require('./helpers');
+// const { write } = require('./helpers/fs/write');
 
 // console.log(fs.read);
 
@@ -17,14 +19,14 @@ app.get('/', (_request, response) => {
 
 // Requisito 1
 app.get('/talker', async (req, res) => {
-  const talker = await fs.read.read();
+  const talker = await read();
   return res.status(200).send(talker);
 });
 
 // requisito 2
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const talker = await fs.read.read();
+  const talker = await read();
   // const talkerParse = JSON.parse(talker);
   const talkerId = talker.find((el) => el.id === Number(id));
   // console.log(talkerId);
@@ -33,6 +35,13 @@ app.get('/talker/:id', async (req, res) => {
       message: 'Pessoa palestrante não encontrada' });
    }
    return res.status(200).json(talkerId);
+});
+
+// requisito 3
+app.post('/login', async (req, res) => {
+  const tokenttt = randomUUID().split('-').join('').substring(0, 16);
+
+  return res.status(200).json({ token: tokenttt });
 });
 
 app.listen(PORT, () => {
