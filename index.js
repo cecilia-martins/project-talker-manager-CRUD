@@ -2,7 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { randomUUID } = require('crypto');
 const { read } = require('./helpers');
-const { validationEmail, validationPassdword } = require('./middlewares/validations');
+const { validationEmail, validationPassdword } = require('./middlewares/loginValidations');
+const { tokenValidation } = require('./middlewares/tokenValidation');
+const { nameValidation,
+  ageValidation, talkValidation } = require('./middlewares/talkerValidations');
 
 // console.log(fs.read);
 
@@ -37,11 +40,17 @@ app.get('/talker/:id', async (req, res) => {
    return res.status(200).json(talkerId);
 });
 
-// requisito 3
+// requisito 3 e 4
 app.post('/login', validationEmail, validationPassdword, async (req, res) => {
   const tokenttt = randomUUID().split('-').join('').substring(0, 16);
 
   return res.status(200).json({ token: tokenttt });
+});
+
+// requisito 5
+app.post('/talker', tokenValidation, nameValidation, ageValidation,
+  talkValidation, async (req, res) => {
+  res.send('aaaaaaaaaaaa');
 });
 
 app.listen(PORT, () => {
