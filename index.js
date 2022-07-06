@@ -30,9 +30,7 @@ app.get('/talker', async (req, res) => {
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
   const talker = await read();
-  // const talkerParse = JSON.parse(talker);
   const talkerId = talker.find((el) => el.id === Number(id));
-  // console.log(talkerId);
   if (!talkerId) {
     return res.status(404).json({
       message: 'Pessoa palestrante não encontrada' });
@@ -41,7 +39,7 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 // requisito 3 e 4
-app.post('/login', validationEmail, validationPassdword, async (req, res) => {
+app.post('/login', validationEmail, validationPassdword, (req, res) => {
   const tokenttt = randomUUID().split('-').join('').substring(0, 16);
 
   return res.status(200).json({ token: tokenttt });
@@ -52,11 +50,15 @@ app.post('/talker', tokenValidation, nameValidation, ageValidation,
   talkValidation, rateValidation, async (req, res) => {
   const talker = await read();
   const { name, age, talk } = req.body;
-  // const { watchedAt, rate } = talk;
   const addTalker = { name, age, id: talker.length + 1, talk };
   const ttt = [...talker, addTalker];
   await write(ttt);
   return res.status(201).json(addTalker);
+});
+
+// requisito 6
+app.put('/talker/:id', tokenValidation, async (req, res) => {
+  res.send('66666666666666666666666666666666666666');
 });
 
 app.listen(PORT, () => {
