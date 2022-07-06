@@ -25,7 +25,35 @@ const ageValidation = (req, res, next) => {
 };
 
 const talkValidation = (req, res, next) => {
-  console.log('talkkkkkkkkkkkk');
+  const { talk } = req.body;
+  const regexDate = /^\d{2}\/\d{2}\/\d{4}$/;
+
+  if (!talk) {
+    return res.status(400)
+    .json({ message: 'O campo "talk" é obrigatório' });
+  }
+
+  if (typeof talk.watchedAt === 'undefined' || talk.watchedAt === null) {
+    return res.status(400).json({ message: 'O campo "watchedAt" é obrigatório' });
+  }
+
+  if (!regexDate.test(talk.watchedAt)) {
+    return res.status(400).json({ message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"' });
+  }
+  // console.log(talk);
+  return next();
+};
+
+const rateValidation = (req, res, next) => {
+  const { talk } = req.body;
+  
+  if (typeof talk.rate === 'undefined' || talk.rate === null) {
+    return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
+  }
+  if (talk.rate <= 0 || talk.rate > 5) {
+    return res.status(400).json({ message: 'O campo "rate" deve ser um inteiro de 1 à 5' });
+  }
+
   return next();
 };
 
@@ -33,4 +61,5 @@ module.exports = {
   nameValidation,
   ageValidation,
   talkValidation,
+  rateValidation,
 };

@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { randomUUID } = require('crypto');
-const { read } = require('./helpers');
+const { read, write } = require('./helpers');
 const { validationEmail, validationPassdword } = require('./middlewares/loginValidations');
 const { tokenValidation } = require('./middlewares/tokenValidation');
 const { nameValidation,
-  ageValidation, talkValidation } = require('./middlewares/talkerValidations');
+  ageValidation, talkValidation, rateValidation } = require('./middlewares/talkerValidations');
 
 // console.log(fs.read);
 
@@ -49,8 +49,14 @@ app.post('/login', validationEmail, validationPassdword, async (req, res) => {
 
 // requisito 5
 app.post('/talker', tokenValidation, nameValidation, ageValidation,
-  talkValidation, async (req, res) => {
-  res.send('aaaaaaaaaaaa');
+  talkValidation, rateValidation, async (req, res) => {
+  const talker = await read();
+  const { name, age, talk } = req.body;
+  // const { watchedAt, rate } = talk;
+  const addTalker = { name, age, id: talker.length + 1, talk };
+  const ttt = [...talker, addTalker];
+  await write(ttt);
+  return res.status(201).json(addTalker);
 });
 
 app.listen(PORT, () => {
