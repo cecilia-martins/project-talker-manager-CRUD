@@ -1,13 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { randomUUID } = require('crypto');
-const { read, write } = require('./helpers');
-const { validationEmail, validationPassdword } = require('./middlewares/loginValidations');
-const { tokenValidation } = require('./middlewares/tokenValidation');
-const { nameValidation,
-  ageValidation, talkValidation, rateValidation } = require('./middlewares/talkerValidations');
 
-// console.log(fs.read);
+const routerTalker = require('./routes/talker');
+const routerLogin = require('./routes/login');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,58 +15,8 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-// Requisito 1
-app.get('/talker', async (req, res) => {
-  const talker = await read();
-  return res.status(200).send(talker);
-});
-
-// requisito 2
-app.get('/talker/:id', async (req, res) => {
-  const { id } = req.params;
-  const talker = await read();
-  const talkerId = talker.find((el) => el.id === Number(id));
-  if (!talkerId) {
-    return res.status(404).json({
-      message: 'Pessoa palestrante não encontrada' });
-   }
-   return res.status(200).json(talkerId);
-});
-
-// requisito 3 e 4
-app.post('/login', validationEmail, validationPassdword, (req, res) => {
-  const tokenttt = randomUUID().split('-').join('').substring(0, 16);
-
-  return res.status(200).json({ token: tokenttt });
-});
-
-// requisito 5
-app.post('/talker', tokenValidation, nameValidation, ageValidation,
-  talkValidation, rateValidation, async (req, res) => {
-  const talker = await read();
-  const { name, age, talk } = req.body;
-  const addTalker = { name, age, id: talker.length + 1, talk };
-  const ttt = [...talker, addTalker];
-  await write(ttt);
-  return res.status(201).json(addTalker);
-});
-
-// requisito 6
-app.put('/talker/:id', tokenValidation, nameValidation,
-ageValidation, talkValidation, rateValidation, async (req, res) => {
-  const { id } = req.params;
-  const { name, age, talk } = req.body;
-  const talker = await read();
-  const addTalker = {
-    name, age, talk };
-  const idTalker = talker.find((eleTalker) => eleTalker.id === Number(id));
-  if (!idTalker) {
-    return res.status(400).send({ message: 'Pessoa palestrante não encontrada' });
-  }
-  Object.assign(idTalker, addTalker);
-  await write(talker);
-  return res.status(200).json(idTalker);
-});
+app.use('/talker', routerTalker);
+app.use('/login', routerLogin);
 
 app.listen(PORT, () => {
   console.log('Online na http://localhost:3000');
