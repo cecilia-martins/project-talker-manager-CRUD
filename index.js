@@ -57,8 +57,20 @@ app.post('/talker', tokenValidation, nameValidation, ageValidation,
 });
 
 // requisito 6
-app.put('/talker/:id', tokenValidation, async (req, res) => {
-  res.send('66666666666666666666666666666666666666');
+app.put('/talker/:id', tokenValidation, nameValidation,
+ageValidation, talkValidation, rateValidation, async (req, res) => {
+  const { id } = req.params;
+  const { name, age, talk } = req.body;
+  const talker = await read();
+  const addTalker = {
+    name, age, talk };
+  const idTalker = talker.find((eleTalker) => eleTalker.id === Number(id));
+  if (!idTalker) {
+    return res.status(400).send({ message: 'Pessoa palestrante não encontrada' });
+  }
+  Object.assign(idTalker, addTalker);
+  await write(talker);
+  return res.status(200).json(idTalker);
 });
 
 app.listen(PORT, () => {
